@@ -37,8 +37,10 @@ jobs:
         docker build -t username/myapp:${{ github.sha }} .
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
         docker push username/myapp:${{ github.sha }}
-
+        
     - name: Deploy to Kubernetes
       run: |
-        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" 
+        gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp  bitbucket@"${BASTION}":~/$SERVICE_NAME-$BITBUCKET_COMMIT-deployment.yaml --zone "$GCLOUD_ZONE"
+        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl set image deployment/henry02 henry02=asia-southeast1-docker.pkg.dev/sn2-dev/hello-app-tls/hello-app-tls:$COMMIT_SHA"
+
         
