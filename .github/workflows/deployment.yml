@@ -26,6 +26,12 @@ jobs:
     - name: Run tests
       run: mvn test
       
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0.3.0
+      with:
+        service_account_key: ${{ secrets.GCR_SERVICE_ACCOUNT_KEY }}
+        export_default_credentials: true
+        
     - name: Build and push Docker images
       run: |
         docker build -t username/myapp:${{ github.sha }} .
@@ -33,6 +39,5 @@ jobs:
         docker push username/myapp:${{ github.sha }}
 
     - name: Deploy to Kubernetes
-      run: kubectl apply -f deployment.yml
-      env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
+      run: |
+        kubectl apply -f 
