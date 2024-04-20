@@ -34,13 +34,18 @@ jobs:
         
     - name: Build and push Docker images
       run: |
-        docker build -t username/myapp:${{ github.sha }} .
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-        docker push username/myapp:${{ github.sha }}
+        docker build -t asia-southeast1-docker.pkg.dev/sn2-dev2/henry-test-app/henry-test-app:${{ github.sha }} -f Dockerfile .
+        docker build -t ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }} -f Dockerfile .
+        gcloud auth configure-docker ${{ secrets.ART_HOSTNAME }} --quiet
+        docker push ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+        docker push asia-southeast1-docker.pkg.dev/sn2-dev2/henry-test-app/henry-test-app:${{ github.sha }}
+        
+    - name: Change target image name.
+      run: |
+        sed -i 's/replace/${{ secrets.ART_HOSTNAME }}\/${{ secrets.PROJECT_ID }}\/${{ secrets.REPO_NAME }}\/${{ secrets.SERVICE_NAME }}:${{ github.sha }}/'
         
     - name: Deploy to Kubernetes
       run: |
-        gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp  bitbucket@"${BASTION}":~/$SERVICE_NAME-$BITBUCKET_COMMIT-deployment.yaml --zone "$GCLOUD_ZONE"
+        gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a"
+        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl apply -f "
         gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl set image deployment/henry02 henry02=asia-southeast1-docker.pkg.dev/sn2-dev/hello-app-tls/hello-app-tls:$COMMIT_SHA"
-
-        
