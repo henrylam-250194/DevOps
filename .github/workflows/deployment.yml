@@ -42,10 +42,11 @@ jobs:
         
     - name: Change target image name.
       run: |
-        sed -i 's/replace/${{ secrets.ART_HOSTNAME }}\/${{ secrets.PROJECT_ID }}\/${{ secrets.REPO_NAME }}\/${{ secrets.SERVICE_NAME }}:${{ github.sha }}/'
+        sed -i 's/replace/${{ secrets.ART_HOSTNAME }}\/${{ secrets.PROJECT_ID }}\/${{ secrets.REPO_NAME }}\/${{ secrets.SERVICE_NAME }}:${{ github.sha }}/' k8s_deployment_service.yaml
         
     - name: Deploy to Kubernetes
       run: |
         gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a"
-        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl apply -f "
-        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl set image deployment/henry02 henry02=asia-southeast1-docker.pkg.dev/sn2-dev/hello-app-tls/hello-app-tls:$COMMIT_SHA"
+        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl apply -f real-deployment.yaml"
+        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "rm -rf real-deployment.yaml"
+        
