@@ -40,7 +40,13 @@ jobs:
         docker push ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
         docker push asia-southeast1-docker.pkg.dev/sn2-dev2/henry-test-app/henry-test-app:${{ github.sha }}
         
+    - name: Trivy base image scanning.
+      run: |
+        chmod u+x ./trivy-docker-image-scan.sh
+        ./trivy-docker-image-scan.sh
+        
     - name: Change target image name.
+      if: success()
       run: |
         sed -i 's/replace/${{ secrets.ART_HOSTNAME }}\/${{ secrets.PROJECT_ID }}\/${{ secrets.REPO_NAME }}\/${{ secrets.SERVICE_NAME }}:${{ github.sha }}/' k8s_deployment_service.yaml
         
