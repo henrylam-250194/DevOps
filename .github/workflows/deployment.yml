@@ -40,4 +40,5 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f 
+        gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" 
+        
