@@ -52,10 +52,16 @@ jobs:
     - name: Deployment yaml file security scanning
       run: |
         docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml
+    
     - name: Kubesec scanning.
       run: |
          chmod u+x ./kubesec-scan.sh
          bash kubesec-scan.sh
+         
+    - name: Trivy scan apps image
+      run: |
+         chmod u+x ./trivy-k8s-scan.sh
+         bash trivy-k8s-scan.sh
          
     - name: Change target image name.
       if: success()
