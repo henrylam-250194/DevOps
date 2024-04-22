@@ -39,6 +39,7 @@ jobs:
         docker build -t ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }} -f Dockerfile .
         gcloud auth configure-docker ${{ secrets.ART_HOSTNAME }} --quiet
         docker push ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+        echo ${{ secrets.ART_HOSTNAME }}\/${{ secrets.PROJECT_ID }}\/${{ secrets.REPO_NAME }}\/${{ secrets.SERVICE_NAME }}:${{ github.sha }} > $IMAGE_NAME
         
     - name: Trivy base image scanning.
       run: |
