@@ -47,6 +47,11 @@ jobs:
     - name: OPA Scaning.
       run: |
         docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile
+        
+    - name: Deployment yaml file security scanning
+      run: |
+        docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml
+        
     - name: Change target image name.
       if: success()
       run: |
@@ -54,7 +59,7 @@ jobs:
         
     - name: Deploy to Kubernetes
       run: |
-        gcloud compute --project "$PROJECT_ID" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a" --quiet
+        gcloud compute --project "${{ secrets.PROJECT_ID }}" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a" --quiet
         gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl apply -f real-deployment.yaml"
         gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "rm -rf real-deployment.yaml"
         
