@@ -34,11 +34,9 @@ jobs:
         
     - name: Build and push Docker images
       run: |
-        docker build -t asia-southeast1-docker.pkg.dev/sn2-dev2/henry-test-app/henry-test-app:${{ github.sha }} -f Dockerfile .
         docker build -t ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }} -f Dockerfile .
         gcloud auth configure-docker ${{ secrets.ART_HOSTNAME }} --quiet
         docker push ${{ secrets.ART_HOSTNAME }}/${{ secrets.PROJECT_ID }}/${{ secrets.REPO_NAME }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
-        docker push asia-southeast1-docker.pkg.dev/sn2-dev2/henry-test-app/henry-test-app:${{ github.sha }}
         
     - name: Trivy base image scanning.
       run: |
