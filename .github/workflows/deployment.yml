@@ -54,7 +54,7 @@ jobs:
         
     - name: Deploy to Kubernetes
       run: |
-        gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a"
+        gcloud beta compute --project "$GCLOUD_PROJECT_ID" scp k8s_deployment_service.yaml bitbucket@"bastion-01":~/real-deployment.yaml --zone "asia-southeast1-a" --quite
         gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "kubectl apply -f real-deployment.yaml"
         gcloud compute ssh --zone "asia-southeast1-a" "bastion-01" --project "sn2-dev2" --command "rm -rf real-deployment.yaml"
         
