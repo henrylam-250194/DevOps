@@ -44,6 +44,7 @@ jobs:
       run: |
         chmod u+x ./trivy-docker-image-scan.sh
         ./trivy-docker-image-scan.sh
+        
     - name: OPA Scaning.
       run: |
         docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile
