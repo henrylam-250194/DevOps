@@ -11,7 +11,7 @@ on:
 jobs:
   deploy-to-dev:
     if: github.ref == 'refs/heads/main'
-    uses: .github/workflows/devopscicd.yml@main
+    uses: ./.github/workflows/devopscicd.yml@main
     secrets:
          GCR_SERVICE_ACCOUNT_KEY: ${{ secrets.GCR_SERVICE_ACCOUNT_KEY_DEV }}
          ART_HOSTNAME: ${{ secrets.ART_HOSTNAME }}
