@@ -18,6 +18,15 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - scan-type: "trivy"
+            script: "./trivy-docker-image-scan.sh"
+          - scan-type: "opa-docker"
+            script: "docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile"
+          - scan-type: "opa-k8s"
+            script: "docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml"
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -40,18 +49,22 @@ jobs:
         service_account_key: ${{ secrets.GCR_SERVICE_ACCOUNT_KEY }}
         export_default_credentials: true
         
-    - name: Trivy base image scanning.
+    - name: Run security scan
       run: |
-        chmod u+x ./trivy-docker-image-scan.sh
-        ./trivy-docker-image-scan.sh
+        chmod u+x ${{ matrix.script }}
+        ${{ matrix.script }}
+    # - name: Trivy base image scanning.
+    #   run: |
+    #     chmod u+x ./trivy-docker-image-scan.sh
+    #     ./trivy-docker-image-scan.sh
         
-    - name: OPA Scaning.
-      run: |
-        docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile
+    # - name: OPA Scaning.
+    #   run: |
+    #     docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile
         
-    - name: Deployment yaml file security scanning
-      run: |
-        docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml
+    # - name: Deployment yaml file security scanning
+    #   run: |
+    #     docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-k8s-security.rego k8s_deployment_service.yaml
         
     - name: Build and push Docker images
       run: |
