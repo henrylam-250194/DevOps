@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine:latest
+FROM openjdk:8-jdk-alpine
 EXPOSE 8080
 ARG JAR_FILE=target/*.jar
 RUN addgroup -S pipeline && adduser -S k8s-pipeline -G pipeline
